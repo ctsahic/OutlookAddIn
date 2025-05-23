@@ -14,6 +14,8 @@ namespace OutlookAddIn1
             this.tab1 = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
             this.tzahiButton = this.Factory.CreateRibbonButton();
+            this.patEditBox = this.Factory.CreateRibbonEditBox();
+            this.btnSavePat = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
@@ -27,6 +29,8 @@ namespace OutlookAddIn1
             // group1
             // 
             this.group1.Items.Add(this.tzahiButton);
+            this.group1.Items.Add(this.patEditBox);
+            this.group1.Items.Add(this.btnSavePat);
             this.group1.Label = "My Group";
             this.group1.Name = "group1";
             // 
@@ -35,6 +39,17 @@ namespace OutlookAddIn1
             this.tzahiButton.Label = "Create Bug";
             this.tzahiButton.Name = "tzahiButton";
             this.tzahiButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.tzahiButton_Click);
+            // 
+            // patEditBox
+            // 
+            this.patEditBox.Label = "PAT";
+            this.patEditBox.Name = "patEditBox";
+            // 
+            // btnSavePat
+            // 
+            this.btnSavePat.Label = "Save";
+            this.btnSavePat.Name = "btnSavePat";
+            this.btnSavePat.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnSavePat_Click);
             // 
             // MyRibbon
             // 
@@ -52,7 +67,8 @@ namespace OutlookAddIn1
 
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
-  
+        internal Microsoft.Office.Tools.Ribbon.RibbonEditBox patEditBox;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnSavePat;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton tzahiButton;
     }
 }
