@@ -8,9 +8,9 @@ using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using OutlookAddIn;
 using System;
+using System.Configuration;
 using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
 using Outlook = Microsoft.Office.Interop.Outlook;
-using Microsoft.Office.Tools.Ribbon;
 using OutlookAddIn1.Models;
 using OutlookAddIn1.Services;
 using System.Net;
@@ -21,23 +21,16 @@ namespace OutlookAddIn1
     public partial class MyRibbon : RibbonBase
     {
         private readonly ICredentialService _credentialService;
-        private readonly IAzureDevOpsService _azureDevOpsService;
-        private readonly IEmailService _emailService;
+        private IAzureDevOpsService _azureDevOpsService;  // Changed from IAsyncLazy<T>
+        private readonly IEmailService _emailService;     
+        private AzureDevOpsConfig _config;
 
         public MyRibbon() : base(Globals.Factory.GetRibbonFactory())
         {
             InitializeComponent();
-
-            var config = new AzureDevOpsConfig
-            {
-                OrganizationUrl = "https://dev.azure.com/cohentsahi",
-                ProjectName = "cohentzahi_agile",
-                DefaultAssignee = "Tsahi Cohen"
-            };
-
             _credentialService = new WindowsCredentialService();
-            _azureDevOpsService = new AzureDevOpsService(config);
             _emailService = new OutlookEmailService();
+            _config = new AzureDevOpsConfig();
         }
 
         private void MyRibbon_Load(object sender, RibbonUIEventArgs e)
@@ -47,36 +40,107 @@ namespace OutlookAddIn1
             {
                 patEditBox.Text = new string('●', 8);
             }
+
+            // Load saved configuration
+            var savedConfig = _credentialService.GetAzureDevOpsConfig();
+            if (savedConfig != null)
+            {
+                organizationUrlEditBox.Text = savedConfig.OrganizationUrl;
+                projectNameEditBox.Text = savedConfig.ProjectName;
+                defaultAssigneeEditBox.Text = savedConfig.DefaultAssignee;
+                _config = savedConfig;
+                _azureDevOpsService = new AzureDevOpsService(_config);
+            }
+        }
+
+        private void btnSaveConfig_Click(object sender, RibbonControlEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(organizationUrlEditBox.Text) ||
+                string.IsNullOrWhiteSpace(projectNameEditBox.Text) ||
+                string.IsNullOrWhiteSpace(defaultAssigneeEditBox.Text))
+            {
+                MessageBox.Show("Please fill in all Azure DevOps configuration fields.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                _config = new AzureDevOpsConfig
+                {
+                    OrganizationUrl = organizationUrlEditBox.Text,
+                    ProjectName = projectNameEditBox.Text,
+                    DefaultAssignee = defaultAssigneeEditBox.Text
+                };
+
+                _credentialService.SaveAzureDevOpsConfig(_config);
+                _azureDevOpsService = new AzureDevOpsService(_config);
+
+                MessageBox.Show("Azure DevOps configuration saved successfully.", "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving configuration: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnSavePat_Click(object sender, RibbonControlEventArgs e)
         {
             string enteredPat = patEditBox.Text;
-            if (!string.IsNullOrWhiteSpace(enteredPat) && !enteredPat.Contains("●"))
+            if (string.IsNullOrWhiteSpace(enteredPat))
+            {
+                MessageBox.Show("Please enter a valid PAT.", "Validation Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (enteredPat.Contains("●"))
+            {
+                MessageBox.Show("Please enter a new PAT, not the masked one.", "Validation Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
             {
                 _credentialService.SavePat(enteredPat);
                 patEditBox.Text = new string('●', 8);
-                MessageBox.Show("PAT saved successfully.");
+                MessageBox.Show("PAT saved successfully.", "Success", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving PAT: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private async void tzahiButton_Click(object sender, RibbonControlEventArgs e)
+        private async void createBug_Click(object sender, RibbonControlEventArgs e)
         {
             try
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                if (_azureDevOpsService == null)
+                {
+                    MessageBox.Show("Please configure Azure DevOps settings first.", "Configuration Required",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
                 string pat = _credentialService.GetPat();
                 if (string.IsNullOrEmpty(pat))
                 {
-                    MessageBox.Show("Please enter and save your PAT first.");
+                    MessageBox.Show("Please enter and save your PAT first.", "Missing PAT", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 var mail = _emailService.GetSelectedEmail();
                 if (mail == null)
                 {
-                    MessageBox.Show("Please select a mail item.");
+                    MessageBox.Show("Please select a mail item.", "No Selection", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
