@@ -10,22 +10,39 @@ using OutlookAddIn;
 using System;
 using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
 using Outlook = Microsoft.Office.Interop.Outlook;
+using Microsoft.Office.Tools.Ribbon;
+using OutlookAddIn1.Models;
+using OutlookAddIn1.Services;
+using System.Net;
+using System.Windows.Forms;
 
 namespace OutlookAddIn1
 {
     public partial class MyRibbon : RibbonBase
     {
-        private readonly string _azureDevOpsUrl = "https://dev.azure.com/cohentsahi";
-        private readonly string _projectName = "cohentzahi_agile";
+        private readonly ICredentialService _credentialService;
+        private readonly IAzureDevOpsService _azureDevOpsService;
+        private readonly IEmailService _emailService;
 
         public MyRibbon() : base(Globals.Factory.GetRibbonFactory())
         {
             InitializeComponent();
+
+            var config = new AzureDevOpsConfig
+            {
+                OrganizationUrl = "https://dev.azure.com/cohentsahi",
+                ProjectName = "cohentzahi_agile",
+                DefaultAssignee = "Tsahi Cohen"
+            };
+
+            _credentialService = new WindowsCredentialService();
+            _azureDevOpsService = new AzureDevOpsService(config);
+            _emailService = new OutlookEmailService();
         }
 
         private void MyRibbon_Load(object sender, RibbonUIEventArgs e)
         {
-            var storedPat = GetPat();
+            var storedPat = _credentialService.GetPat();
             if (!string.IsNullOrEmpty(storedPat))
             {
                 patEditBox.Text = new string('●', 8);
@@ -37,84 +54,51 @@ namespace OutlookAddIn1
             string enteredPat = patEditBox.Text;
             if (!string.IsNullOrWhiteSpace(enteredPat) && !enteredPat.Contains("●"))
             {
-                SavePat(enteredPat);
+                _credentialService.SavePat(enteredPat);
                 patEditBox.Text = new string('●', 8);
-                System.Windows.Forms.MessageBox.Show("PAT saved successfully.");
+                MessageBox.Show("PAT saved successfully.");
             }
-        }
-
-        private string CleanDescription(string emailBody)
-        {
-            emailBody = System.Text.RegularExpressions.Regex.Replace(emailBody, "<[^>]*>", string.Empty);
-            emailBody = System.Text.RegularExpressions.Regex.Replace(emailBody, @"\s+", " ");
-            return emailBody.Trim();
         }
 
         private async void tzahiButton_Click(object sender, RibbonControlEventArgs e)
         {
             try
             {
-                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-                string pat = GetPat();
+                string pat = _credentialService.GetPat();
                 if (string.IsNullOrEmpty(pat))
                 {
-                    System.Windows.Forms.MessageBox.Show("Please enter and save your PAT first.");
+                    MessageBox.Show("Please enter and save your PAT first.");
                     return;
                 }
 
-                Outlook.Application app = new Outlook.Application();
-                Outlook.MailItem mail = app.ActiveExplorer().Selection[1] as Outlook.MailItem;
+                var mail = _emailService.GetSelectedEmail();
                 if (mail == null)
                 {
-                    System.Windows.Forms.MessageBox.Show("Please select a mail item.");
+                    MessageBox.Show("Please select a mail item.");
                     return;
                 }
 
                 string title = mail.Subject;
-                string description = CleanDescription(mail.Body);
+                string description = _emailService.CleanDescription(mail.Body);
 
-                var connection = new VssConnection(new Uri(_azureDevOpsUrl), new VssBasicCredential(string.Empty, pat));
-                var witClient = connection.GetClient<WorkItemTrackingHttpClient>();
+                var result = await _azureDevOpsService.CreateBugAsync(title, description, pat);
 
-                var patchDocument = new JsonPatchDocument
-                {
-                    new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Title", Value = title },
-                    new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/Microsoft.VSTS.TCM.ReproSteps", Value = description },
-                    new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.History", Value = "Created from Outlook email" },
-                    new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.State", Value = "New" },
-                    new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.AssignedTo", Value = "Tsahi Cohen" },
-                    new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Tags", Value = "Created-From-Outlook" }
-                };
-
-                WorkItem result = await witClient.CreateWorkItemAsync(patchDocument, _projectName, "Bug");
-
-                System.Windows.Forms.MessageBox.Show(
+                MessageBox.Show(
                     $"Bug created successfully!\n\nItem ID: {result.Id}",
                     "Success",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Information);
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(
+                MessageBox.Show(
                     $"Error creating bug:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}",
                     "Error",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Error);
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
-        }
-
-        private void SavePat(string pat)
-        {
-            var cred = new Credential { Target = "AzureDevOpsBugReporter", Password = pat, PersistanceType = PersistanceType.LocalComputer };
-            cred.Save();
-        }
-
-        private string GetPat()
-        {
-            var cred = new Credential { Target = "AzureDevOpsBugReporter" };
-            return cred.Load() ? cred.Password : null;
         }
     }
 }

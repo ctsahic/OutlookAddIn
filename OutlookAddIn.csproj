@@ -330,6 +330,7 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Models\AzureDevOpsConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -361,6 +362,12 @@
     <Compile Include="Ribbon1.Designer.cs">
       <DependentUpon>Ribbon1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Services\AzureDevOpsService.cs" />
+    <Compile Include="Services\IAzureDevOpsService.cs" />
+    <Compile Include="Services\ICredentialService.cs" />
+    <Compile Include="Services\IEmailService.cs" />
+    <Compile Include="Services\OutlookEmailService.cs" />
+    <Compile Include="Services\WindowsCredentialService.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>

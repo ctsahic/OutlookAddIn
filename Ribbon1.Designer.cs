@@ -44,6 +44,7 @@ namespace OutlookAddIn1
             // 
             this.patEditBox.Label = "PAT";
             this.patEditBox.Name = "patEditBox";
+            this.patEditBox.Text = null;
             // 
             // btnSavePat
             // 
