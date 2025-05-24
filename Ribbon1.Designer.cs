@@ -7,7 +7,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace OutlookAddIn1
 {
-    partial class MyRibbon
+    partial class MyRibbon : Microsoft.Office.Tools.Ribbon.RibbonBase
     {
         private void InitializeComponent()
         {
@@ -30,6 +30,7 @@ namespace OutlookAddIn1
             // 
             // tab1
             // 
+            this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
             this.tab1.Groups.Add(this.group1);
             this.tab1.Groups.Add(this.group2);
             this.tab1.Groups.Add(this.group3);
@@ -49,21 +50,21 @@ namespace OutlookAddIn1
             // 
             this.organizationUrlEditBox.Label = "Organization URL";
             this.organizationUrlEditBox.Name = "organizationUrlEditBox";
-            this.organizationUrlEditBox.SizeString = "https://dev.azure.com/your-org";
+            this.organizationUrlEditBox.SizeString = "XXXXXXXXXX";
             this.organizationUrlEditBox.Text = null;
             // 
             // projectNameEditBox
             // 
             this.projectNameEditBox.Label = "Project Name";
             this.projectNameEditBox.Name = "projectNameEditBox";
-            this.projectNameEditBox.SizeString = "your-project";
+            this.projectNameEditBox.SizeString = "XXXXXXXXXX";
             this.projectNameEditBox.Text = null;
             // 
             // defaultAssigneeEditBox
             // 
             this.defaultAssigneeEditBox.Label = "Default Assignee";
             this.defaultAssigneeEditBox.Name = "defaultAssigneeEditBox";
-            this.defaultAssigneeEditBox.SizeString = "Your Name";
+            this.defaultAssigneeEditBox.SizeString = "XXXXXXXXXX";
             this.defaultAssigneeEditBox.Text = null;
             // 
             // btnSaveConfig
@@ -83,7 +84,7 @@ namespace OutlookAddIn1
             // 
             this.patEditBox.Label = "Personal Access Token";
             this.patEditBox.Name = "patEditBox";
-            this.patEditBox.SizeString = "●●●●●●●●●●●●●●●●●●●●";
+            this.patEditBox.SizeString = "XXXXXXXXXX";
             this.patEditBox.Text = null;
             // 
             // btnSavePat

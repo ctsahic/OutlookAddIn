@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
-  <ribbon>
-    <tabs>
-      <tab id="tab1" label="Azure DevOps">
-        <group id="group1" label="Configuration">
-          <editBox id="organizationUrlEditBox" label="Organization URL" sizeString="https://dev.azure.com/your-org" />
-          <editBox id="projectNameEditBox" label="Project Name" sizeString="your-project" />
-          <editBox id="defaultAssigneeEditBox" label="Default Assignee" sizeString="Your Name" />
-          <button id="btnSaveConfig" label="Save Config" onAction="btnSaveConfig_Click" />
-        </group>
-        <group id="group2" label="Authentication">
-          <editBox id="patEditBox" label="Personal Access Token" sizeString="●●●●●●●●●●●●●●●●●●●●" />
-          <button id="btnSavePat" label="Save PAT" onAction="btnSavePat_Click" />
-        </group>
-        <group id="group3" label="Actions">
-          <button id="tzahiButton" label="Create Bug" onAction="tzahiButton_Click" />
-        </group>
-      </tab>
-    </tabs>
-  </ribbon>
+	<ribbon>
+		<tabs>
+			<tab id="tab1" label="Azure DevOps">
+				<group id="group1" label="Configuration">
+					<editBox id="organizationUrlEditBox"
+							label="Organization URL"
+							sizeString="XXXXXXXXXX" />
+					<editBox id="projectNameEditBox"
+							label="Project Name"
+							sizeString="XXXXXXXXXX" />
+					<editBox id="defaultAssigneeEditBox"
+							label="Default Assignee"
+							sizeString="XXXXXXXXXX" />
+					<button id="btnSaveConfig"
+							label="Save Config"
+							onAction="btnSaveConfig_Click" />
+				</group>
+				<group id="group2" label="Authentication">
+					<editBox id="patEditBox"
+							label="Personal Access Token"
+							sizeString="XXXXXXXXXX" />
+					<button id="btnSavePat"
+							label="Save PAT"
+							onAction="btnSavePat_Click" />
+				</group>
+				<group id="group3" label="Actions">
+					<button id="tzahiButton"
+							label="Create Bug"
+							onAction="tzahiButton_Click" />
+				</group>
+			</tab>
+		</tabs>
+	</ribbon>
 </customUI>
