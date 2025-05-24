@@ -343,8 +343,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Ribbon1.resx">
-      <DependentUpon>Ribbon1.cs</DependentUpon>
+    <EmbeddedResource Include="AzureRibbon.resx">
+      <DependentUpon>AzureRibbon.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="OutlookAddIn_TemporaryKey.pfx" />
     <None Include="packages.config" />
@@ -356,11 +356,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Ribbon1.cs">
+    <Compile Include="AzureRibbon.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Ribbon1.Designer.cs">
-      <DependentUpon>Ribbon1.cs</DependentUpon>
+    <Compile Include="AzureRibbon.Designer.cs">
+      <DependentUpon>AzureRibbon.cs</DependentUpon>
     </Compile>
     <Compile Include="Services\AzureDevOpsService.cs" />
     <Compile Include="Services\IAzureDevOpsService.cs" />
@@ -380,7 +380,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Ribbon1.xml" />
+    <Content Include="AzureRibbon.xml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

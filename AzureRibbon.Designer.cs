@@ -34,7 +34,7 @@ namespace OutlookAddIn1
             this.tab1.Groups.Add(this.group1);
             this.tab1.Groups.Add(this.group2);
             this.tab1.Groups.Add(this.group3);
-            this.tab1.Label = "Azure DevOps";
+            this.tab1.Label = "Azure";
             this.tab1.Name = "tab1";
             // 
             // group1
@@ -48,28 +48,28 @@ namespace OutlookAddIn1
             // 
             // organizationUrlEditBox
             // 
-            this.organizationUrlEditBox.Label = "Organization URL";
+            this.organizationUrlEditBox.Label = "URL";
             this.organizationUrlEditBox.Name = "organizationUrlEditBox";
             this.organizationUrlEditBox.SizeString = "XXXXXXXXXX";
             this.organizationUrlEditBox.Text = null;
             // 
             // projectNameEditBox
             // 
-            this.projectNameEditBox.Label = "Project Name";
+            this.projectNameEditBox.Label = "Project";
             this.projectNameEditBox.Name = "projectNameEditBox";
             this.projectNameEditBox.SizeString = "XXXXXXXXXX";
             this.projectNameEditBox.Text = null;
             // 
             // defaultAssigneeEditBox
             // 
-            this.defaultAssigneeEditBox.Label = "Default Assignee";
+            this.defaultAssigneeEditBox.Label = "Assignee";
             this.defaultAssigneeEditBox.Name = "defaultAssigneeEditBox";
             this.defaultAssigneeEditBox.SizeString = "XXXXXXXXXX";
             this.defaultAssigneeEditBox.Text = null;
             // 
             // btnSaveConfig
             // 
-            this.btnSaveConfig.Label = "Save Config";
+            this.btnSaveConfig.Label = "Save";
             this.btnSaveConfig.Name = "btnSaveConfig";
             this.btnSaveConfig.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnSaveConfig_Click);
             // 
@@ -82,7 +82,7 @@ namespace OutlookAddIn1
             // 
             // patEditBox
             // 
-            this.patEditBox.Label = "Personal Access Token";
+            this.patEditBox.Label = "PAT";
             this.patEditBox.Name = "patEditBox";
             this.patEditBox.SizeString = "XXXXXXXXXX";
             this.patEditBox.Text = null;
