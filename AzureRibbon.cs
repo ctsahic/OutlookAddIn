@@ -53,7 +53,7 @@ namespace OutlookAddIn1
             }
         }
 
-        private void btnSaveConfig_Click(object sender, RibbonControlEventArgs e)
+        private void btnSaveAll_Click(object sender, RibbonControlEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(organizationUrlEditBox.Text) ||
                 string.IsNullOrWhiteSpace(projectNameEditBox.Text) ||

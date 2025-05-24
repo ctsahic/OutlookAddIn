@@ -12,127 +12,104 @@ namespace OutlookAddIn1
         private void InitializeComponent()
         {
             this.tab1 = this.Factory.CreateRibbonTab();
-            this.group1 = this.Factory.CreateRibbonGroup();
+            this.groupUrl = this.Factory.CreateRibbonGroup();
+            this.groupPat = this.Factory.CreateRibbonGroup();
+            this.groupActions = this.Factory.CreateRibbonGroup();
             this.organizationUrlEditBox = this.Factory.CreateRibbonEditBox();
             this.projectNameEditBox = this.Factory.CreateRibbonEditBox();
             this.defaultAssigneeEditBox = this.Factory.CreateRibbonEditBox();
-            this.btnSaveConfig = this.Factory.CreateRibbonButton();
-            this.group2 = this.Factory.CreateRibbonGroup();
             this.patEditBox = this.Factory.CreateRibbonEditBox();
-            this.btnSavePat = this.Factory.CreateRibbonButton();
-            this.group3 = this.Factory.CreateRibbonGroup();
+            this.btnSaveAll = this.Factory.CreateRibbonButton();
             this.tzahiButton = this.Factory.CreateRibbonButton();
+            
             this.tab1.SuspendLayout();
-            this.group1.SuspendLayout();
-            this.group2.SuspendLayout();
-            this.group3.SuspendLayout();
+            this.groupUrl.SuspendLayout();
+            this.groupPat.SuspendLayout();
+            this.groupActions.SuspendLayout();
             this.SuspendLayout();
-            // 
+            
             // tab1
-            // 
             this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
-            this.tab1.Groups.Add(this.group1);
-            this.tab1.Groups.Add(this.group2);
-            this.tab1.Groups.Add(this.group3);
+            this.tab1.Groups.Add(this.groupUrl);
+            this.tab1.Groups.Add(this.groupPat);
+            this.tab1.Groups.Add(this.groupActions);
             this.tab1.Label = "Azure";
             this.tab1.Name = "tab1";
-            // 
-            // group1
-            // 
-            this.group1.Items.Add(this.organizationUrlEditBox);
-            this.group1.Items.Add(this.projectNameEditBox);
-            this.group1.Items.Add(this.defaultAssigneeEditBox);
-            this.group1.Items.Add(this.btnSaveConfig);
-            this.group1.Label = "Configuration";
-            this.group1.Name = "group1";
-            // 
+            
+            // groupUrl (Configuration)
+            this.groupUrl.Items.Add(this.organizationUrlEditBox);
+            this.groupUrl.Items.Add(this.projectNameEditBox);
+            this.groupUrl.Items.Add(this.defaultAssigneeEditBox);
+            this.groupUrl.Label = "URL Configuration";
+            this.groupUrl.Name = "groupUrl";
+            
             // organizationUrlEditBox
-            // 
             this.organizationUrlEditBox.Label = "URL";
             this.organizationUrlEditBox.Name = "organizationUrlEditBox";
             this.organizationUrlEditBox.SizeString = "XXXXXXXXXX";
-            this.organizationUrlEditBox.Text = null;
-            // 
+            
             // projectNameEditBox
-            // 
             this.projectNameEditBox.Label = "Project";
             this.projectNameEditBox.Name = "projectNameEditBox";
             this.projectNameEditBox.SizeString = "XXXXXXXXXX";
-            this.projectNameEditBox.Text = null;
-            // 
+            
             // defaultAssigneeEditBox
-            // 
             this.defaultAssigneeEditBox.Label = "Assignee";
             this.defaultAssigneeEditBox.Name = "defaultAssigneeEditBox";
             this.defaultAssigneeEditBox.SizeString = "XXXXXXXXXX";
-            this.defaultAssigneeEditBox.Text = null;
-            // 
-            // btnSaveConfig
-            // 
-            this.btnSaveConfig.Label = "Save";
-            this.btnSaveConfig.Name = "btnSaveConfig";
-            this.btnSaveConfig.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnSaveConfig_Click);
-            // 
-            // group2
-            // 
-            this.group2.Items.Add(this.patEditBox);
-            this.group2.Items.Add(this.btnSavePat);
-            this.group2.Label = "Authentication";
-            this.group2.Name = "group2";
-            // 
+            
+            // groupPat (Authentication)
+            this.groupPat.Items.Add(this.patEditBox);
+            this.groupPat.Items.Add(this.btnSaveAll);
+            this.groupPat.Label = "Authentication";
+            this.groupPat.Name = "groupPat";
+            
             // patEditBox
-            // 
             this.patEditBox.Label = "PAT";
             this.patEditBox.Name = "patEditBox";
             this.patEditBox.SizeString = "XXXXXXXXXX";
-            this.patEditBox.Text = null;
-            // 
-            // btnSavePat
-            // 
-            this.btnSavePat.Label = "Save PAT";
-            this.btnSavePat.Name = "btnSavePat";
-            this.btnSavePat.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnSavePat_Click);
-            // 
-            // group3
-            // 
-            this.group3.Items.Add(this.tzahiButton);
-            this.group3.Label = "Actions";
-            this.group3.Name = "group3";
-            // 
+            
+            // btnSaveAll
+            this.btnSaveAll.Label = "Save All";
+            this.btnSaveAll.Name = "btnSaveAll";
+            this.btnSaveAll.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnSaveAll_Click);
+            
+            // groupActions
+            this.groupActions.Items.Add(this.tzahiButton);
+            this.groupActions.Label = "Actions";
+            this.groupActions.Name = "groupActions";
+            
             // tzahiButton
-            // 
             this.tzahiButton.Label = "Create Bug";
             this.tzahiButton.Name = "tzahiButton";
             this.tzahiButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.createBug_Click);
-            // 
+            
             // MyRibbon
-            // 
             this.Name = "MyRibbon";
             this.RibbonType = "Microsoft.Outlook.Explorer";
             this.Tabs.Add(this.tab1);
             this.Load += new Microsoft.Office.Tools.Ribbon.RibbonUIEventHandler(this.MyRibbon_Load);
+            
             this.tab1.ResumeLayout(false);
             this.tab1.PerformLayout();
-            this.group1.ResumeLayout(false);
-            this.group1.PerformLayout();
-            this.group2.ResumeLayout(false);
-            this.group2.PerformLayout();
-            this.group3.ResumeLayout(false);
-            this.group3.PerformLayout();
+            this.groupUrl.ResumeLayout(false);
+            this.groupUrl.PerformLayout();
+            this.groupPat.ResumeLayout(false);
+            this.groupPat.PerformLayout();
+            this.groupActions.ResumeLayout(false);
+            this.groupActions.PerformLayout();
             this.ResumeLayout(false);
-
         }
 
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
-        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
-        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group2;
-        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group3;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupUrl;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupPat;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupActions;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox organizationUrlEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox projectNameEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox defaultAssigneeEditBox;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnSaveConfig;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox patEditBox;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnSavePat;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnSaveAll;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton tzahiButton;
     }
 }
