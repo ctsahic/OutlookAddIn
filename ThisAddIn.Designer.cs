@@ -238,6 +238,12 @@ namespace OutlookAddIn {
         internal ThisRibbonCollection(global::Microsoft.Office.Tools.Ribbon.RibbonFactory factory) : 
                 base(factory) {
         }
+
+        internal OutlookAddIn.MyRibbon MyRibbon {
+            get {
+                return this.GetRibbon<OutlookAddIn.MyRibbon>();
+            }
+        }
         
         internal ThisRibbonCollection this[Microsoft.Office.Interop.Outlook.Inspector inspector] {
             get {

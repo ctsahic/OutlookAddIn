@@ -1,9 +1,9 @@
 using CredentialManagement;
-using OutlookAddIn1.Models;
+using OutlookAddIn.Models;
 using System;
 using System.Text.Json;
 
-namespace OutlookAddIn1.Services
+namespace OutlookAddIn.Services
 {
     public class WindowsCredentialService : ICredentialService
     {

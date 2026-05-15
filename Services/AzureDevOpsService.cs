@@ -6,9 +6,9 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
-using OutlookAddIn1.Models;
+using OutlookAddIn.Models;
 
-namespace OutlookAddIn1.Services
+namespace OutlookAddIn.Services
 {
     public class AzureDevOpsService : IAzureDevOpsService
     {
@@ -16,11 +16,16 @@ namespace OutlookAddIn1.Services
 
         public AzureDevOpsService(AzureDevOpsConfig config)
         {
-            _config = config;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         public async Task<WorkItem> CreateBugAsync(string title, string description, string pat)
         {
+            if (string.IsNullOrWhiteSpace(title))
+                throw new ArgumentNullException(nameof(title));
+            if (string.IsNullOrWhiteSpace(pat))
+                throw new ArgumentNullException(nameof(pat));
+
             var connection = new VssConnection(
                 new Uri(_config.OrganizationUrl),
                 new VssBasicCredential(string.Empty, pat));
@@ -30,14 +35,23 @@ namespace OutlookAddIn1.Services
             var patchDocument = new JsonPatchDocument
             {
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Title", Value = title },
-                new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/Microsoft.VSTS.TCM.ReproSteps", Value = description },
+                new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/Microsoft.VSTS.TCM.ReproSteps", Value = description ?? string.Empty },
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.History", Value = "Created from Outlook email" },
-                new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.State", Value = "New" },
-                new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.AssignedTo", Value = _config.DefaultAssignee },
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Tags", Value = "Created-From-Outlook" }
             };
 
-            return await witClient.CreateWorkItemAsync(patchDocument, _config.ProjectName, "Bug");
+            // Add assignee if configured
+            if (!string.IsNullOrWhiteSpace(_config.DefaultAssignee))
+            {
+                patchDocument.Add(new JsonPatchOperation 
+                { 
+                    Operation = Operation.Add, 
+                    Path = "/fields/System.AssignedTo", 
+                    Value = _config.DefaultAssignee 
+                });
+            }
+
+            return await witClient.CreateWorkItemAsync(patchDocument, _config.ProjectName, "Bug", bypassRules: true);
         }
     }
 }

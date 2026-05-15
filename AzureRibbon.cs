@@ -1,119 +1,144 @@
 ﻿using CredentialManagement;
 using Microsoft.Office.Tools.Ribbon;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
-using Microsoft.VisualStudio.Services.WebApi.Patch;
-using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
-using OutlookAddIn;
 using System;
-using System.Configuration;
-using static Microsoft.TeamFoundation.Common.Internal.NativeMethods;
 using Outlook = Microsoft.Office.Interop.Outlook;
-using OutlookAddIn1.Models;
-using OutlookAddIn1.Services;
-using System.Net;
+using OutlookAddIn.Models;
+using OutlookAddIn.Services;
 using System.Windows.Forms;
 
-namespace OutlookAddIn1
+namespace OutlookAddIn
 {
     public partial class MyRibbon : RibbonBase
     {
-        private readonly ICredentialService _credentialService;
-        private IAzureDevOpsService _azureDevOpsService;  // Changed from IAsyncLazy<T>
-        private readonly IEmailService _emailService;     
+        private ICredentialService _credentialService;
+        private IAzureDevOpsService _azureDevOpsService;
+        private IEmailService _emailService;
         private AzureDevOpsConfig _config;
+        private bool _initialized;
 
         public MyRibbon() : base(Globals.Factory.GetRibbonFactory())
         {
             InitializeComponent();
-            _credentialService = new WindowsCredentialService();
-            _emailService = new OutlookEmailService();
-            _config = new AzureDevOpsConfig();
         }
 
         private void MyRibbon_Load(object sender, RibbonUIEventArgs e)
         {
-            var storedPat = _credentialService.GetPat();
-            if (!string.IsNullOrEmpty(storedPat))
-            {
-                patEditBox.Text = new string('●', 8);
-            }
-
-            // Load saved configuration
-            var savedConfig = _credentialService.GetAzureDevOpsConfig();
-            if (savedConfig != null)
-            {
-                organizationUrlEditBox.Text = savedConfig.OrganizationUrl;
-                projectNameEditBox.Text = savedConfig.ProjectName;
-                defaultAssigneeEditBox.Text = savedConfig.DefaultAssignee;
-                _config = savedConfig;
-                _azureDevOpsService = new AzureDevOpsService(_config);
-            }
-        }
-
-        private void btnSaveAll_Click(object sender, RibbonControlEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(organizationUrlEditBox.Text) ||
-                string.IsNullOrWhiteSpace(projectNameEditBox.Text) ||
-                string.IsNullOrWhiteSpace(defaultAssigneeEditBox.Text))
-            {
-                MessageBox.Show("Please fill in all Azure DevOps configuration fields.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            if (_initialized)
                 return;
-            }
+
+            _initialized = true;
 
             try
             {
+                _credentialService = new WindowsCredentialService();
+                _emailService = new OutlookEmailService();
+                LoadSavedConfiguration();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error during ribbon load: {ex.Message}");
+            }
+        }
+
+        private void LoadSavedConfiguration()
+        {
+            if (_credentialService == null)
+                return;
+
+            try
+            {
+                var storedPat = _credentialService.GetPat();
+                if (!string.IsNullOrEmpty(storedPat))
+                    patEditBox.Text = new string('●', 8);
+
+                var savedConfig = _credentialService.GetAzureDevOpsConfig();
+                if (savedConfig != null)
+                {
+                    organizationUrlEditBox.Text = savedConfig.OrganizationUrl ?? string.Empty;
+                    projectNameEditBox.Text = savedConfig.ProjectName ?? string.Empty;
+                    defaultAssigneeEditBox.Text = savedConfig.DefaultAssignee ?? string.Empty;
+                    
+                    if (!string.IsNullOrEmpty(savedConfig.OrganizationUrl))
+                    {
+                        _config = savedConfig;
+                        _azureDevOpsService = new AzureDevOpsService(_config);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading configuration: {ex.Message}");
+            }
+        }
+
+        private bool ValidateAndSaveConfiguration()
+        {
+            try
+            {
+                var url = organizationUrlEditBox.Text?.Trim();
+                var project = projectNameEditBox.Text?.Trim();
+                var assignee = defaultAssigneeEditBox.Text?.Trim();
+                var pat = patEditBox.Text?.Trim();
+
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    MessageBox.Show("Please enter the Azure DevOps Organization URL.", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(project))
+                {
+                    MessageBox.Show("Please enter the Project Name.", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(assignee))
+                {
+                    MessageBox.Show("Please enter the Default Assignee.", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(pat) || pat.Contains("●"))
+                {
+                    MessageBox.Show("Please enter a valid Personal Access Token (PAT).", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+                    url = "https://" + url;
+
+                var uriTest = new Uri(url);
+                
                 _config = new AzureDevOpsConfig
                 {
-                    OrganizationUrl = organizationUrlEditBox.Text,
-                    ProjectName = projectNameEditBox.Text,
-                    DefaultAssignee = defaultAssigneeEditBox.Text
+                    OrganizationUrl = url,
+                    ProjectName = project,
+                    DefaultAssignee = assignee
                 };
 
                 _credentialService.SaveAzureDevOpsConfig(_config);
+                _credentialService.SavePat(pat);
                 _azureDevOpsService = new AzureDevOpsService(_config);
-
-                MessageBox.Show("Azure DevOps configuration saved successfully.", "Success",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                patEditBox.Text = new string('●', 8);
+                
+                return true;
+            }
+            catch (UriFormatException)
+            {
+                MessageBox.Show("Please enter a valid URL. Example: https://dev.azure.com/yourorganization",
+                    "Invalid URL", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error saving configuration: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void btnSavePat_Click(object sender, RibbonControlEventArgs e)
-        {
-            string enteredPat = patEditBox.Text;
-            if (string.IsNullOrWhiteSpace(enteredPat))
-            {
-                MessageBox.Show("Please enter a valid PAT.", "Validation Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (enteredPat.Contains("●"))
-            {
-                MessageBox.Show("Please enter a new PAT, not the masked one.", "Validation Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
-                _credentialService.SavePat(enteredPat);
-                patEditBox.Text = new string('●', 8);
-                MessageBox.Show("PAT saved successfully.", "Success", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error saving PAT: {ex.Message}", "Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
@@ -121,17 +146,20 @@ namespace OutlookAddIn1
         {
             try
             {
-                if (_azureDevOpsService == null)
+                if (_credentialService == null || _emailService == null)
                 {
-                    MessageBox.Show("Please configure Azure DevOps settings first.", "Configuration Required",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Add-in failed to initialize properly. Please restart Outlook.", "Initialization Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+
+                if (!ValidateAndSaveConfiguration())
+                    return;
 
                 string pat = _credentialService.GetPat();
                 if (string.IsNullOrEmpty(pat))
                 {
-                    MessageBox.Show("Please enter and save your PAT first.", "Missing PAT", 
+                    MessageBox.Show("Please enter a valid Personal Access Token (PAT).", "Missing PAT",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -139,15 +167,12 @@ namespace OutlookAddIn1
                 var mail = _emailService.GetSelectedEmail();
                 if (mail == null)
                 {
-                    MessageBox.Show("Please select a mail item.", "No Selection", 
+                    MessageBox.Show("Please select a mail item first.", "No Selection",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                string title = mail.Subject;
-                string description = _emailService.CleanDescription(mail.Body);
-
-                var result = await _azureDevOpsService.CreateBugAsync(title, description, pat);
+                var result = await _azureDevOpsService.CreateBugAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat);
 
                 MessageBox.Show(
                     $"Bug created successfully!\n\nItem ID: {result.Id}",
@@ -157,11 +182,8 @@ namespace OutlookAddIn1
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"Error creating bug:\n\n{ex.Message}\n\nStack Trace:\n{ex.StackTrace}",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show($"Error creating bug:\n\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

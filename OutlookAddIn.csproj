@@ -1,4 +1,5 @@
 ﻿<Project ToolsVersion="17.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Costura.Fody.6.0.0\build\Costura.Fody.props" Condition="Exists('packages\Costura.Fody.6.0.0\build\Costura.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--
     This section defines project-level properties.
@@ -31,7 +32,7 @@
     <ResolveComReferenceSilent>true</ResolveComReferenceSilent>
     <IsWebBootstrapper>False</IsWebBootstrapper>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <PublishUrl>C:\Users\cohen\Desktop\OutlookBugAddin\</PublishUrl>
+    <PublishUrl>C:\Users\cohen\AndroidStudioProjects\VISUAL_STUDIO\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
     <ApplicationVersion>1.0.0.0</ApplicationVersion>
@@ -45,6 +46,8 @@
     <FriendlyName>OutlookAddIn</FriendlyName>
     <OfficeApplicationDescription />
     <LoadBehavior>3</LoadBehavior>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -124,6 +127,9 @@
   -->
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="Costura, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>packages\Costura.Fody.6.0.0\lib\netstandard2.0\Costura.dll</HintPath>
+    </Reference>
     <Reference Include="CredentialManagement, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\CredentialManagement.1.0.2\lib\net35\CredentialManagement.dll</HintPath>
     </Reference>
@@ -346,6 +352,8 @@
     <EmbeddedResource Include="AzureRibbon.resx">
       <DependentUpon>AzureRibbon.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="App.config" />
+    <None Include="CLEANUP_SUMMARY.md" />
     <None Include="OutlookAddIn_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -379,9 +387,6 @@
     </Compile>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="AzureRibbon.xml" />
-  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -394,6 +399,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>2730A4811EB4E612852D06462E46D16484028C0E</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -410,4 +418,14 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="packages\Fody.6.8.2\build\Fody.targets" Condition="Exists('packages\Fody.6.8.2\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Fody.6.8.2\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.6.8.2\build\Fody.targets'))" />
+    <Error Condition="!Exists('packages\Costura.Fody.6.0.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Costura.Fody.6.0.0\build\Costura.Fody.props'))" />
+    <Error Condition="!Exists('packages\Costura.Fody.6.0.0\build\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Costura.Fody.6.0.0\build\Costura.Fody.targets'))" />
+  </Target>
+  <Import Project="packages\Costura.Fody.6.0.0\build\Costura.Fody.targets" Condition="Exists('packages\Costura.Fody.6.0.0\build\Costura.Fody.targets')" />
 </Project>

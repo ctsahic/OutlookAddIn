@@ -1,6 +1,6 @@
-using OutlookAddIn1.Models;
+using OutlookAddIn.Models;
 
-namespace OutlookAddIn1.Services
+namespace OutlookAddIn.Services
 {
     public interface ICredentialService
     {

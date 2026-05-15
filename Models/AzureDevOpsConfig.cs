@@ -1,4 +1,4 @@
-namespace OutlookAddIn1.Models
+namespace OutlookAddIn.Models
 {
     public class AzureDevOpsConfig
     {

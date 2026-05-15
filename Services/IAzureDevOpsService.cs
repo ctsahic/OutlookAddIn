@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
-namespace OutlookAddIn1.Services
+namespace OutlookAddIn.Services
 {
     public interface IAzureDevOpsService
     {

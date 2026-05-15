@@ -1,6 +1,6 @@
 using Outlook = Microsoft.Office.Interop.Outlook;
 
-namespace OutlookAddIn1.Services
+namespace OutlookAddIn.Services
 {
     public interface IEmailService
     {

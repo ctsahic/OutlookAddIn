@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Office.Tools.Ribbon;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
-namespace OutlookAddIn1
+namespace OutlookAddIn
 {
     partial class MyRibbon : Microsoft.Office.Tools.Ribbon.RibbonBase
     {
@@ -19,7 +19,6 @@ namespace OutlookAddIn1
             this.projectNameEditBox = this.Factory.CreateRibbonEditBox();
             this.defaultAssigneeEditBox = this.Factory.CreateRibbonEditBox();
             this.patEditBox = this.Factory.CreateRibbonEditBox();
-            this.btnSaveAll = this.Factory.CreateRibbonButton();
             this.tzahiButton = this.Factory.CreateRibbonButton();
             
             this.tab1.SuspendLayout();
@@ -60,7 +59,6 @@ namespace OutlookAddIn1
             
             // groupPat (Authentication)
             this.groupPat.Items.Add(this.patEditBox);
-            this.groupPat.Items.Add(this.btnSaveAll);
             this.groupPat.Label = "Authentication";
             this.groupPat.Name = "groupPat";
             
@@ -68,11 +66,6 @@ namespace OutlookAddIn1
             this.patEditBox.Label = "PAT";
             this.patEditBox.Name = "patEditBox";
             this.patEditBox.SizeString = "XXXXXXXXXX";
-            
-            // btnSaveAll
-            this.btnSaveAll.Label = "Save All";
-            this.btnSaveAll.Name = "btnSaveAll";
-            this.btnSaveAll.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnSaveAll_Click);
             
             // groupActions
             this.groupActions.Items.Add(this.tzahiButton);
@@ -109,7 +102,6 @@ namespace OutlookAddIn1
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox projectNameEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox defaultAssigneeEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox patEditBox;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnSaveAll;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton tzahiButton;
     }
 }
