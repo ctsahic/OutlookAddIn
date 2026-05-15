@@ -336,6 +336,9 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Forms\WorkItemCreatedDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Models\AzureDevOpsConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -354,6 +357,7 @@
     </EmbeddedResource>
     <None Include="App.config" />
     <None Include="CLEANUP_SUMMARY.md" />
+    <None Include="FEATURE_WORKITEM_LINK.md" />
     <None Include="OutlookAddIn_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -386,6 +390,7 @@
       <DependentUpon>ThisAddIn.Designer.xml</DependentUpon>
     </Compile>
     <AppDesigner Include="Properties\" />
+    <None Include="WORKITEM_LINK_IMPLEMENTATION.md" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

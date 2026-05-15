@@ -5,6 +5,7 @@ using System;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using OutlookAddIn.Models;
 using OutlookAddIn.Services;
+using OutlookAddIn.Forms;
 using System.Windows.Forms;
 
 namespace OutlookAddIn
@@ -174,11 +175,11 @@ namespace OutlookAddIn
 
                 var result = await _azureDevOpsService.CreateBugAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat);
 
-                MessageBox.Show(
-                    $"Bug created successfully!\n\nItem ID: {result.Id}",
-                    "Success",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                // Show custom dialog with link to the created work item
+                using (var dialog = new WorkItemCreatedDialog(result.Id ?? 0, _config.OrganizationUrl, _config.ProjectName))
+                {
+                    dialog.ShowDialog();
+                }
             }
             catch (Exception ex)
             {
