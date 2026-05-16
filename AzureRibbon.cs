@@ -13,6 +13,7 @@ namespace OutlookAddIn
     public partial class MyRibbon : RibbonBase
     {
         private ICredentialService _credentialService;
+        private ConfigurationService _configurationService;
         private IAzureDevOpsService _azureDevOpsService;
         private IEmailService _emailService;
         private AzureDevOpsConfig _config;
@@ -33,6 +34,8 @@ namespace OutlookAddIn
             try
             {
                 _credentialService = new WindowsCredentialService();
+                _configurationService = new ConfigurationService(_credentialService);
+                _configurationService.InitializeDefaultConfigurations();
                 _emailService = new OutlookEmailService();
                 LoadSavedConfiguration();
             }
@@ -82,23 +85,32 @@ namespace OutlookAddIn
                 var assignee = defaultAssigneeEditBox.Text?.Trim();
                 var pat = patEditBox.Text?.Trim();
 
-                if (string.IsNullOrWhiteSpace(url))
+                // Try to populate from dynamic configuration if values are missing
+                url = _configurationService.GetFieldValue("OrganizationUrl", url);
+                project = _configurationService.GetFieldValue("ProjectName", project);
+                assignee = _configurationService.GetFieldValue("DefaultAssignee", assignee);
+
+                // Validate using configuration service
+                var urlValidation = _configurationService.ValidateField("OrganizationUrl", url);
+                if (!urlValidation.IsValid)
                 {
-                    MessageBox.Show("Please enter the Azure DevOps Organization URL.", "Validation Error",
+                    MessageBox.Show(urlValidation.ErrorMessage, "Validation Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
 
-                if (string.IsNullOrWhiteSpace(project))
+                var projectValidation = _configurationService.ValidateField("ProjectName", project);
+                if (!projectValidation.IsValid)
                 {
-                    MessageBox.Show("Please enter the Project Name.", "Validation Error",
+                    MessageBox.Show(projectValidation.ErrorMessage, "Validation Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
 
-                if (string.IsNullOrWhiteSpace(assignee))
+                var assigneeValidation = _configurationService.ValidateField("DefaultAssignee", assignee);
+                if (!assigneeValidation.IsValid)
                 {
-                    MessageBox.Show("Please enter the Default Assignee.", "Validation Error",
+                    MessageBox.Show(assigneeValidation.ErrorMessage, "Validation Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
@@ -186,7 +198,10 @@ namespace OutlookAddIn
                     return;
                 }
 
-                var result = await _azureDevOpsService.CreateBugAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat);
+                // Get dynamic parameters to include in the work item
+                var dynamicParams = _configurationService.GetAllDynamicParameters();
+
+                var result = await _azureDevOpsService.CreateBugAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat, dynamicParams);
 
                 // Show custom dialog with link to the created work item
                 using (var dialog = new WorkItemCreatedDialog(result.Id ?? 0, _config.OrganizationUrl, _config.ProjectName))
@@ -197,6 +212,22 @@ namespace OutlookAddIn
             catch (Exception ex)
             {
                 MessageBox.Show($"Error creating bug:\n\n{ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void settings_Click(object sender, RibbonControlEventArgs e)
+        {
+            try
+            {
+                using (var dialog = new ConfigurationDialog(_configurationService, _credentialService))
+                {
+                    dialog.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening configuration: {ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

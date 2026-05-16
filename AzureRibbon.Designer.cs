@@ -15,16 +15,19 @@ namespace OutlookAddIn
             this.groupUrl = this.Factory.CreateRibbonGroup();
             this.groupPat = this.Factory.CreateRibbonGroup();
             this.groupActions = this.Factory.CreateRibbonGroup();
+            this.groupSettings = this.Factory.CreateRibbonGroup();
             this.organizationUrlEditBox = this.Factory.CreateRibbonEditBox();
             this.projectNameEditBox = this.Factory.CreateRibbonEditBox();
             this.defaultAssigneeEditBox = this.Factory.CreateRibbonEditBox();
             this.patEditBox = this.Factory.CreateRibbonEditBox();
             this.tzahiButton = this.Factory.CreateRibbonButton();
+            this.settingsButton = this.Factory.CreateRibbonButton();
             
             this.tab1.SuspendLayout();
             this.groupUrl.SuspendLayout();
             this.groupPat.SuspendLayout();
             this.groupActions.SuspendLayout();
+            this.groupSettings.SuspendLayout();
             this.SuspendLayout();
             
             // tab1
@@ -32,6 +35,7 @@ namespace OutlookAddIn
             this.tab1.Groups.Add(this.groupUrl);
             this.tab1.Groups.Add(this.groupPat);
             this.tab1.Groups.Add(this.groupActions);
+            this.tab1.Groups.Add(this.groupSettings);
             this.tab1.Label = "Azure";
             this.tab1.Name = "tab1";
             
@@ -77,6 +81,16 @@ namespace OutlookAddIn
             this.tzahiButton.Name = "tzahiButton";
             this.tzahiButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.createBug_Click);
             
+            // groupSettings
+            this.groupSettings.Items.Add(this.settingsButton);
+            this.groupSettings.Label = "Settings";
+            this.groupSettings.Name = "groupSettings";
+            
+            // settingsButton
+            this.settingsButton.Label = "Configuration";
+            this.settingsButton.Name = "settingsButton";
+            this.settingsButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.settings_Click);
+            
             // MyRibbon
             this.Name = "MyRibbon";
             this.RibbonType = "Microsoft.Outlook.Explorer";
@@ -91,6 +105,8 @@ namespace OutlookAddIn
             this.groupPat.PerformLayout();
             this.groupActions.ResumeLayout(false);
             this.groupActions.PerformLayout();
+            this.groupSettings.ResumeLayout(false);
+            this.groupSettings.PerformLayout();
             this.ResumeLayout(false);
         }
 
@@ -98,10 +114,12 @@ namespace OutlookAddIn
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupUrl;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupPat;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupActions;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupSettings;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox organizationUrlEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox projectNameEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox defaultAssigneeEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox patEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton tzahiButton;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton settingsButton;
     }
 }

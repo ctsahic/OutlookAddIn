@@ -340,6 +340,11 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Models\AzureDevOpsConfig.cs" />
+    <Compile Include="OutlookAddIn\Forms\ConfigurationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OutlookAddIn\Models\FieldConfiguration.cs" />
+    <Compile Include="OutlookAddIn\Services\ConfigurationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -358,6 +363,8 @@
     <None Include="App.config" />
     <None Include="CLEANUP_SUMMARY.md" />
     <None Include="FEATURE_WORKITEM_LINK.md" />
+    <None Include="OutlookAddIn\CONFIGURATION_GUIDE.md" />
+    <None Include="OutlookAddIn\DYNAMIC_PARAMETERS_GUIDE.md" />
     <None Include="OutlookAddIn_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
