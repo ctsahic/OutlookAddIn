@@ -103,8 +103,21 @@ namespace OutlookAddIn
                     return false;
                 }
 
-                if (string.IsNullOrWhiteSpace(pat) || pat.Contains("●"))
+                // Check if PAT is masked (user hasn't changed it from the saved value)
+                if (pat.Contains("●"))
                 {
+                    // PAT is masked, try to use the previously saved PAT
+                    pat = _credentialService.GetPat();
+                    if (string.IsNullOrEmpty(pat))
+                    {
+                        MessageBox.Show("Please enter a valid Personal Access Token (PAT).", "Validation Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return false;
+                    }
+                }
+                else if (string.IsNullOrWhiteSpace(pat))
+                {
+                    // PAT field is empty
                     MessageBox.Show("Please enter a valid Personal Access Token (PAT).", "Validation Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
