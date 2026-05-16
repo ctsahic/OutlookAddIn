@@ -22,6 +22,7 @@ namespace OutlookAddIn
             this.patEditBox = this.Factory.CreateRibbonEditBox();
             this.tzahiButton = this.Factory.CreateRibbonButton();
             this.settingsButton = this.Factory.CreateRibbonButton();
+            this.viewFieldsButton = this.Factory.CreateRibbonButton();
             
             this.tab1.SuspendLayout();
             this.groupUrl.SuspendLayout();
@@ -83,6 +84,7 @@ namespace OutlookAddIn
             
             // groupSettings
             this.groupSettings.Items.Add(this.settingsButton);
+            this.groupSettings.Items.Add(this.viewFieldsButton);
             this.groupSettings.Label = "Settings";
             this.groupSettings.Name = "groupSettings";
             
@@ -90,6 +92,11 @@ namespace OutlookAddIn
             this.settingsButton.Label = "Configuration";
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.settings_Click);
+
+            // viewFieldsButton
+            this.viewFieldsButton.Label = "View Fields";
+            this.viewFieldsButton.Name = "viewFieldsButton";
+            this.viewFieldsButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.viewFields_Click);
             
             // MyRibbon
             this.Name = "MyRibbon";
@@ -121,5 +128,6 @@ namespace OutlookAddIn
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox patEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton tzahiButton;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton settingsButton;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton viewFieldsButton;
     }
 }

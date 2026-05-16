@@ -231,5 +231,38 @@ namespace OutlookAddIn
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void viewFields_Click(object sender, RibbonControlEventArgs e)
+        {
+            try
+            {
+                string pat = _credentialService?.GetPat();
+                if (string.IsNullOrEmpty(pat))
+                {
+                    MessageBox.Show("Please enter a Personal Access Token (PAT) first.", "PAT Required",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (_config == null)
+                {
+                    MessageBox.Show("Please configure Organization URL and Project Name first.", "Configuration Required",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var metadataService = new AzureDevOpsMetadataService(_config);
+                var dialog = new FieldMetadataDialog();
+                
+                // Load fields in the background
+                dialog.LoadFieldsAsync(metadataService, pat);
+                dialog.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error viewing fields: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }
