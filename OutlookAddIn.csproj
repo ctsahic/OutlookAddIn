@@ -349,6 +349,7 @@
     <Compile Include="OutlookAddIn\Models\FieldConfiguration.cs" />
     <Compile Include="OutlookAddIn\Services\AzureDevOpsMetadataService.cs" />
     <Compile Include="OutlookAddIn\Services\ConfigurationService.cs" />
+    <Compile Include="OutlookAddIn\Services\VssConnectionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -32,9 +32,7 @@ namespace OutlookAddIn.Services
             if (string.IsNullOrWhiteSpace(pat))
                 throw new ArgumentNullException(nameof(pat));
 
-            var connection = new VssConnection(
-                new Uri(_config.OrganizationUrl),
-                new VssBasicCredential(string.Empty, pat));
+            var connection = VssConnectionHelper.CreateVssConnection(_config.OrganizationUrl, pat);
 
             var witClient = connection.GetClient<WorkItemTrackingHttpClient>();
 
