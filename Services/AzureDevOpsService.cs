@@ -82,40 +82,85 @@ namespace OutlookAddIn.Services
 
         /// <summary>
         /// Maps a parameter key to an Azure DevOps field path.
-        /// Handles both standard field names and dot-notation for nested fields.
-        /// Examples:
-        ///   "Activity" -> "/fields/Microsoft.VSTS.Common.Activity"
-        ///   "ActivityGroup.Activity" -> "/fields/Microsoft.VSTS.Common.ActivityGroup" and "/fields/Microsoft.VSTS.Common.Activity"
+        /// Supports multiple formats:
+        /// - Simple field names: "Activity" -> "/fields/Microsoft.VSTS.Common.Activity"
+        /// - Full reference names: "Microsoft.VSTS.CMMI.FoundInEnvironment" -> "/fields/Microsoft.VSTS.CMMI.FoundInEnvironment"
+        /// - Field path format: "/fields/Microsoft.VSTS.CMMI.FoundInEnvironment" (returned as-is)
         /// </summary>
         private string MapParameterKeyToFieldPath(string key)
         {
             if (string.IsNullOrWhiteSpace(key))
                 return null;
 
-            // Remove any dot notation and use the last part
+            // If the key already starts with /fields/, return it as-is
+            if (key.StartsWith("/fields/", StringComparison.OrdinalIgnoreCase))
+                return key;
+
+            // If key looks like a full reference name (contains dots and known namespaces), convert it to field path
+            if (key.Contains(".") && (key.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) || 
+                                      key.StartsWith("System.", StringComparison.OrdinalIgnoreCase) ||
+                                      key.StartsWith("Custom.", StringComparison.OrdinalIgnoreCase)))
+            {
+                return $"/fields/{key}";
+            }
+
+            // Extract the last part of the key for simple name mapping
             var parts = key.Split('.');
             var fieldName = parts[parts.Length - 1];
 
-            // Map common Azure DevOps field names
+            // Map common Azure DevOps field names to their full reference paths
             var fieldMappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                { "Activity", "/fields/Microsoft.VSTS.Common.Activity" },
-                { "ActivityGroup", "/fields/Microsoft.VSTS.Common.ActivityGroup" },
+                // System fields
+                { "Title", "/fields/System.Title" },
+                { "Description", "/fields/System.Description" },
+                { "AssignedTo", "/fields/System.AssignedTo" },
+                { "CreatedBy", "/fields/System.CreatedBy" },
+                { "CreatedDate", "/fields/System.CreatedDate" },
+                { "ChangedBy", "/fields/System.ChangedBy" },
+                { "ChangedDate", "/fields/System.ChangedDate" },
+                { "State", "/fields/System.State" },
+                { "Reason", "/fields/System.Reason" },
                 { "Area", "/fields/System.AreaPath" },
+                { "AreaPath", "/fields/System.AreaPath" },
                 { "AreaCode", "/fields/System.AreaPath" },
                 { "Iteration", "/fields/System.IterationPath" },
+                { "IterationPath", "/fields/System.IterationPath" },
+                { "Tags", "/fields/System.Tags" },
+                
+                // Common VSTS fields
+                { "Activity", "/fields/Microsoft.VSTS.Common.Activity" },
+                { "ActivityGroup", "/fields/Microsoft.VSTS.Common.ActivityGroup" },
                 { "Priority", "/fields/Microsoft.VSTS.Common.Priority" },
                 { "Severity", "/fields/Microsoft.VSTS.Common.Severity" },
-                { "State", "/fields/System.State" },
-                { "Tags", "/fields/System.Tags" },
-                { "Reason", "/fields/System.Reason" }
+                { "BacklogPriority", "/fields/Microsoft.VSTS.Common.BacklogPriority" },
+                { "BusinessValue", "/fields/Microsoft.VSTS.Common.BusinessValue" },
+                { "StackRank", "/fields/Microsoft.VSTS.Common.StackRank" },
+                
+                // CMMI Process Template fields
+                { "FoundInEnvironment", "/fields/Microsoft.VSTS.CMMI.FoundInEnvironment" },
+                { "FoundIn", "/fields/Microsoft.VSTS.CMMI.FoundInEnvironment" },
+                { "ResolvedInVersion", "/fields/Microsoft.VSTS.CMMI.ResolvedInVersion" },
+                { "ResolvedIn", "/fields/Microsoft.VSTS.CMMI.ResolvedInVersion" },
+                { "Blocked", "/fields/Microsoft.VSTS.CMMI.Blocked" },
+                { "Issue", "/fields/Microsoft.VSTS.CMMI.Issue" },
+                { "RequiresReview", "/fields/Microsoft.VSTS.CMMI.RequiresReview" },
+                { "RequiresTest", "/fields/Microsoft.VSTS.CMMI.RequiresTest" },
+                { "RootCause", "/fields/Microsoft.VSTS.CMMI.RootCause" },
+                { "SystemInfo", "/fields/Microsoft.VSTS.CMMI.SystemInfo" },
+                
+                // TCM (Test Case Management) fields
+                { "ReproSteps", "/fields/Microsoft.VSTS.TCM.ReproSteps" }
             };
 
             if (fieldMappings.ContainsKey(fieldName))
                 return fieldMappings[fieldName];
 
-            // If not a known field, attempt to construct the path
-            // This allows for custom fields with names like "Custom.MyField"
+            // If not a known field and contains dots, return as-is with /fields/ prefix
+            if (key.Contains("."))
+                return $"/fields/{key}";
+            
+            // Otherwise, treat as custom field
             return $"/fields/Custom.{fieldName}";
         }
     }
