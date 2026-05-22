@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
+using Newtonsoft.Json;
 
 namespace OutlookAddIn.Services
 {
@@ -34,6 +35,22 @@ namespace OutlookAddIn.Services
                 // Bypass the requirement for HTTPS when using basic authentication
                 // This is needed for local Azure DevOps servers using HTTP
                 ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            }
+
+            try
+            {
+                // Initialize Newtonsoft.Json settings to ensure proper serialization
+                // This prevents "Method not found" errors with JsonSerializerSettings
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ"
+                };
+            }
+            catch
+            {
+                // If we can't set default settings, continue anyway
+                // The VssConnection will still work but may have different JSON handling
             }
 
             // Create connection with credentials
