@@ -402,6 +402,7 @@
     <Compile Include="ThisAddIn.Designer.cs">
       <DependentUpon>ThisAddIn.Designer.xml</DependentUpon>
     </Compile>
+    <Compile Include="Models\EmailAttachment.cs" />
     <AppDesigner Include="Properties\" />
     <None Include="WORKITEM_LINK_IMPLEMENTATION.md" />
   </ItemGroup>

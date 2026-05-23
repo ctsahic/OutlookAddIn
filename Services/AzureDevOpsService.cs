@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.IO;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
@@ -20,12 +21,7 @@ namespace OutlookAddIn.Services
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        public async Task<WorkItem> CreateBugAsync(string title, string description, string pat)
-        {
-            return await CreateBugAsync(title, description, pat, new Dictionary<string, string>());
-        }
-
-        public async Task<WorkItem> CreateBugAsync(string title, string description, string pat, Dictionary<string, string> dynamicParameters)
+        public async Task<WorkItem> CreateBugAsync(string title, string description, string pat, Dictionary<string, string> dynamicParameters = null, List<EmailAttachment> attachments = null)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentNullException(nameof(title));
@@ -39,7 +35,6 @@ namespace OutlookAddIn.Services
             var patchDocument = new JsonPatchDocument
             {
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Title", Value = title },
-                new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/Microsoft.VSTS.TCM.ReproSteps", Value = description ?? string.Empty },
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.History", Value = "Created from Outlook email" },
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Tags", Value = "Created-From-Outlook" }
             };
@@ -54,6 +49,44 @@ namespace OutlookAddIn.Services
                     Value = _config.DefaultAssignee 
                 });
             }
+
+            // Process attachments if any
+            if (attachments != null && attachments.Count > 0)
+            {
+                foreach (var attachment in attachments)
+                {
+                    if (!File.Exists(attachment.FilePath)) continue;
+
+                    AttachmentReference attachmentRef;
+                    using (var stream = File.OpenRead(attachment.FilePath))
+                    {
+                        attachmentRef = await witClient.CreateAttachmentAsync(stream, fileName: attachment.FileName);
+                    }
+
+                    if (attachmentRef != null)
+                    {
+                        patchDocument.Add(new JsonPatchOperation
+                        {
+                            Operation = Operation.Add,
+                            Path = "/relations/-",
+                            Value = new
+                            {
+                                rel = "AttachedFile",
+                                url = attachmentRef.Url,
+                                attributes = new { comment = attachment.FileName }
+                            }
+                        });
+
+                        if (attachment.IsInline && !string.IsNullOrEmpty(attachment.ContentId))
+                        {
+                            // Replace cid reference in html mapped description
+                            description = description.Replace($"cid:{attachment.ContentId}", attachmentRef.Url);
+                        }
+                    }
+                }
+            }
+
+            patchDocument.Add(new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/Microsoft.VSTS.TCM.ReproSteps", Value = description ?? string.Empty });
 
             // Add dynamic parameters as custom fields
             if (dynamicParameters != null && dynamicParameters.Count > 0)
@@ -80,12 +113,7 @@ namespace OutlookAddIn.Services
             return await witClient.CreateWorkItemAsync(patchDocument, _config.ProjectName, "Bug", bypassRules: true);
         }
 
-        public async Task<WorkItem> CreateUserStoryAsync(string title, string description, string pat)
-        {
-            return await CreateUserStoryAsync(title, description, pat, new Dictionary<string, string>());
-        }
-
-        public async Task<WorkItem> CreateUserStoryAsync(string title, string description, string pat, Dictionary<string, string> dynamicParameters)
+        public async Task<WorkItem> CreateUserStoryAsync(string title, string description, string pat, Dictionary<string, string> dynamicParameters = null, List<EmailAttachment> attachments = null)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentNullException(nameof(title));
@@ -99,7 +127,6 @@ namespace OutlookAddIn.Services
             var patchDocument = new JsonPatchDocument
             {
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Title", Value = title },
-                new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Description", Value = description ?? string.Empty },
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.History", Value = "Created from Outlook email" },
                 new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Tags", Value = "Created-From-Outlook" }
             };
@@ -114,6 +141,44 @@ namespace OutlookAddIn.Services
                     Value = _config.DefaultAssignee 
                 });
             }
+
+            // Process attachments if any
+            if (attachments != null && attachments.Count > 0)
+            {
+                foreach (var attachment in attachments)
+                {
+                    if (!File.Exists(attachment.FilePath)) continue;
+
+                    AttachmentReference attachmentRef;
+                    using (var stream = File.OpenRead(attachment.FilePath))
+                    {
+                        attachmentRef = await witClient.CreateAttachmentAsync(stream, fileName: attachment.FileName);
+                    }
+
+                    if (attachmentRef != null)
+                    {
+                        patchDocument.Add(new JsonPatchOperation
+                        {
+                            Operation = Operation.Add,
+                            Path = "/relations/-",
+                            Value = new
+                            {
+                                rel = "AttachedFile",
+                                url = attachmentRef.Url,
+                                attributes = new { comment = attachment.FileName }
+                            }
+                        });
+
+                        if (attachment.IsInline && !string.IsNullOrEmpty(attachment.ContentId))
+                        {
+                            // Replace cid reference in html mapped description
+                            description = description.Replace($"cid:{attachment.ContentId}", attachmentRef.Url);
+                        }
+                    }
+                }
+            }
+
+            patchDocument.Add(new JsonPatchOperation { Operation = Operation.Add, Path = "/fields/System.Description", Value = description ?? string.Empty });
 
             // Add dynamic parameters as custom fields
             if (dynamicParameters != null && dynamicParameters.Count > 0)

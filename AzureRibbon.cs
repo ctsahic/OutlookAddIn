@@ -211,14 +211,24 @@ namespace OutlookAddIn
                 // Get dynamic parameters to include in the work item
                 var dynamicParams = _configurationService.GetAllDynamicParameters();
 
+                // Process attachments (including inline images)
+                var attachments = _emailService.ProcessAttachments(mail);
+
+                // Use HTML body to preserve inline images if present
+                string description = mail.HTMLBody;
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    description = _emailService.CleanDescription(mail.Body);
+                }
+
                 Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem result;
                 if (workItemType == "Bug")
                 {
-                    result = await _azureDevOpsService.CreateBugAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat, dynamicParams);
+                    result = await _azureDevOpsService.CreateBugAsync(mail.Subject, description, pat, dynamicParams, attachments);
                 }
                 else
                 {
-                    result = await _azureDevOpsService.CreateUserStoryAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat, dynamicParams);
+                    result = await _azureDevOpsService.CreateUserStoryAsync(mail.Subject, description, pat, dynamicParams, attachments);
                 }
 
                 // Show custom dialog with link to the created work item
