@@ -1,5 +1,4 @@
-﻿<Project ToolsVersion="17.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\Costura.Fody.6.0.0\build\Costura.Fody.props" Condition="Exists('packages\Costura.Fody.6.0.0\build\Costura.Fody.props')" />
+<Project ToolsVersion="17.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--
     This section defines project-level properties.
@@ -93,7 +92,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>$(MSBuildProjectDirectory)\bin\Debug\</OutputPath>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -117,7 +116,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>$(MSBuildProjectDirectory)\bin\Release\</OutputPath>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
@@ -127,9 +126,6 @@
   -->
   <ItemGroup>
     <Reference Include="Accessibility" />
-    <Reference Include="Costura, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
-      <HintPath>packages\Costura.Fody.6.0.0\lib\netstandard2.0\Costura.dll</HintPath>
-    </Reference>
     <Reference Include="CredentialManagement, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\CredentialManagement.1.0.2\lib\net35\CredentialManagement.dll</HintPath>
     </Reference>
@@ -367,6 +363,7 @@
     </EmbeddedResource>
     <None Include="App.config" />
     <None Include="CLEANUP_SUMMARY.md" />
+    <None Include="Directory.Build.props" />
     <None Include="FEATURE_WORKITEM_LINK.md" />
     <None Include="OutlookAddIn\CONFIGURATION_GUIDE.md" />
     <None Include="OutlookAddIn\DYNAMIC_PARAMETERS_GUIDE.md" />
@@ -424,6 +421,11 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <Target Name="ResolveAbsoluteCustomizationPath" BeforeTargets="VisualStudioForApplicationsBuild">
+    <PropertyGroup>
+      <AbsolutePathToCustomization Condition="'$(TargetPath)' != ''">$([System.IO.Path]::GetFullPath('$(TargetPath)'))</AbsolutePathToCustomization>
+    </PropertyGroup>
+  </Target>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- Include additional build rules for an Office application add-in. -->
@@ -439,14 +441,9 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="packages\Fody.6.8.2\build\Fody.targets" Condition="Exists('packages\Fody.6.8.2\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\Fody.6.8.2\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.6.8.2\build\Fody.targets'))" />
-    <Error Condition="!Exists('packages\Costura.Fody.6.0.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Costura.Fody.6.0.0\build\Costura.Fody.props'))" />
-    <Error Condition="!Exists('packages\Costura.Fody.6.0.0\build\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Costura.Fody.6.0.0\build\Costura.Fody.targets'))" />
   </Target>
-  <Import Project="packages\Costura.Fody.6.0.0\build\Costura.Fody.targets" Condition="Exists('packages\Costura.Fody.6.0.0\build\Costura.Fody.targets')" />
 </Project>
