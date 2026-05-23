@@ -8,10 +8,10 @@ namespace OutlookAddIn.Forms
     {
         private string _workItemUrl;
 
-        public WorkItemCreatedDialog(int workItemId, string organizationUrl, string projectName)
+        public WorkItemCreatedDialog(int workItemId, string organizationUrl, string projectName, string workItemType)
         {
             _workItemUrl = BuildWorkItemUrl(organizationUrl, projectName, workItemId);
-            InitializeControls(workItemId);
+            InitializeControls(workItemId, workItemType);
         }
 
         private string BuildWorkItemUrl(string organizationUrl, string projectName, int workItemId)
@@ -23,7 +23,7 @@ namespace OutlookAddIn.Forms
             return $"{organizationUrl}/{projectName}/_workitems/edit/{workItemId}";
         }
 
-        private void InitializeControls(int workItemId)
+        private void InitializeControls(int workItemId, string workItemType)
         {
             this.Text = "Work Item Created";
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -31,12 +31,12 @@ namespace OutlookAddIn.Forms
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.CenterParent;
             this.Width = 450;
-            this.Height = 200;
+            this.Height = 220;
 
             // Title Label
             var titleLabel = new Label
             {
-                Text = "? Bug created successfully!",
+                Text = $"{workItemType} created successfully!",
                 Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Bold),
                 Location = new System.Drawing.Point(20, 20),
                 Size = new System.Drawing.Size(400, 30),

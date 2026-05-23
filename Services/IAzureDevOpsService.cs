@@ -8,5 +8,7 @@ namespace OutlookAddIn.Services
     {
         Task<WorkItem> CreateBugAsync(string title, string description, string pat);
         Task<WorkItem> CreateBugAsync(string title, string description, string pat, Dictionary<string, string> dynamicParameters);
+        Task<WorkItem> CreateUserStoryAsync(string title, string description, string pat);
+        Task<WorkItem> CreateUserStoryAsync(string title, string description, string pat, Dictionary<string, string> dynamicParameters);
     }
 }

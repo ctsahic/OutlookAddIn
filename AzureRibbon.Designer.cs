@@ -21,6 +21,7 @@ namespace OutlookAddIn
             this.defaultAssigneeEditBox = this.Factory.CreateRibbonEditBox();
             this.patEditBox = this.Factory.CreateRibbonEditBox();
             this.tzahiButton = this.Factory.CreateRibbonButton();
+            this.createUserStoryButton = this.Factory.CreateRibbonButton();
             this.settingsButton = this.Factory.CreateRibbonButton();
             this.viewFieldsButton = this.Factory.CreateRibbonButton();
             
@@ -74,6 +75,7 @@ namespace OutlookAddIn
             
             // groupActions
             this.groupActions.Items.Add(this.tzahiButton);
+            this.groupActions.Items.Add(this.createUserStoryButton);
             this.groupActions.Label = "Actions";
             this.groupActions.Name = "groupActions";
             
@@ -81,7 +83,12 @@ namespace OutlookAddIn
             this.tzahiButton.Label = "Create Bug";
             this.tzahiButton.Name = "tzahiButton";
             this.tzahiButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.createBug_Click);
-            
+
+            // createUserStoryButton
+            this.createUserStoryButton.Label = "Create User Story";
+            this.createUserStoryButton.Name = "createUserStoryButton";
+            this.createUserStoryButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.createUserStory_Click);
+
             // groupSettings
             this.groupSettings.Items.Add(this.settingsButton);
             this.groupSettings.Items.Add(this.viewFieldsButton);
@@ -127,6 +134,7 @@ namespace OutlookAddIn
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox defaultAssigneeEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonEditBox patEditBox;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton tzahiButton;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton createUserStoryButton;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton settingsButton;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton viewFieldsButton;
     }

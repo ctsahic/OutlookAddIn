@@ -170,6 +170,16 @@ namespace OutlookAddIn
 
         private async void createBug_Click(object sender, RibbonControlEventArgs e)
         {
+            await CreateWorkItemAsync("Bug");
+        }
+
+        private async void createUserStory_Click(object sender, RibbonControlEventArgs e)
+        {
+            await CreateWorkItemAsync("User Story");
+        }
+
+        private async System.Threading.Tasks.Task CreateWorkItemAsync(string workItemType)
+        {
             try
             {
                 if (_credentialService == null || _emailService == null)
@@ -201,17 +211,25 @@ namespace OutlookAddIn
                 // Get dynamic parameters to include in the work item
                 var dynamicParams = _configurationService.GetAllDynamicParameters();
 
-                var result = await _azureDevOpsService.CreateBugAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat, dynamicParams);
+                Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem result;
+                if (workItemType == "Bug")
+                {
+                    result = await _azureDevOpsService.CreateBugAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat, dynamicParams);
+                }
+                else
+                {
+                    result = await _azureDevOpsService.CreateUserStoryAsync(mail.Subject, _emailService.CleanDescription(mail.Body), pat, dynamicParams);
+                }
 
                 // Show custom dialog with link to the created work item
-                using (var dialog = new WorkItemCreatedDialog(result.Id ?? 0, _config.OrganizationUrl, _config.ProjectName))
+                using (var dialog = new WorkItemCreatedDialog(result.Id ?? 0, _config.OrganizationUrl, _config.ProjectName, workItemType))
                 {
                     dialog.ShowDialog();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error creating bug:\n\n{ex.Message}", "Error",
+                MessageBox.Show($"Error creating {workItemType}:\n\n{ex.Message}", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
